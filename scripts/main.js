@@ -6,6 +6,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
+var colorAliases;
+
+function checkAlias(color, i) {
+    for (let c in colorAliases) {
+        if (colorAliases[c][0] == color[0] && colorAliases[c][1] == color[1] && colorAliases[c][2] == color[2]) {
+            return i + "\n" + c
+        }
+    }
+    return i
+}
+
 define("common", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -281,8 +293,10 @@ define("settings", ["require", "exports"], function (require, exports) {
             this.kMeansMinDeltaDifference = 1;
             this.kMeansClusteringColorSpace = ClusteringColorSpace.RGB;
             this.kMeansColorRestrictions = [];
-            this.colorAliases = {};
-            this.narrowPixelStripCleanupRuns = 3; // 3 seems like a good compromise between removing enough narrow pixel strips to convergence. This fixes e.g. https://i.imgur.com/dz4ANz1.png
+            // this.kMeansColorRestrictions = ["lightGreen", "black"];
+            this.colorAliases = {"lightGreen": [155, 202, 98], "black": [20, 15, 7]};
+            colorAliases = this.colorAliases
+            this.narrowPixelStripCleanpRuns = 3; // 3 seems like a good compromise between removing enough narrow pixel strips to convergence. This fixes e.g. https://i.imgur.com/dz4ANz1.png
             this.removeFacetsSmallerThanNrOfPoints = 20;
             this.removeFacetsFromLargeToSmall = true;
             this.maximumNumberOfFacets = Number.MAX_VALUE;
@@ -3152,7 +3166,7 @@ define("gui", ["require", "exports", "common", "guiprocessmanager", "settings"],
         let html = "";
         for (let c = 0; c < colorsByIndex.length; c++) {
             const style = "background-color: " + `rgb(${colorsByIndex[c][0]},${colorsByIndex[c][1]},${colorsByIndex[c][2]})`;
-            html += `<div class="color" class="tooltipped" style="${style}" data-tooltip="${colorsByIndex[c][0]},${colorsByIndex[c][1]},${colorsByIndex[c][2]}">${c}</div>`;
+            html += `<div class="color" class="tooltipped" style="${style}" data-tooltip="${colorsByIndex[c][0]},${colorsByIndex[c][1]},${colorsByIndex[c][2]}">${checkAlias(colorsByIndex[c], c)}</div>`;
         }
         return $(html);
     }
@@ -3181,7 +3195,7 @@ define("gui", ["require", "exports", "common", "guiprocessmanager", "settings"],
             ctx.fillRect(x, y, cellWidth, cellHeight - 20);
             ctx.strokeStyle = "#888";
             ctx.strokeRect(x, y, cellWidth, cellHeight - 20);
-            const nrText = i + "";
+            const nrText = checkAlias(color, i);
             ctx.fillStyle = "black";
             ctx.strokeStyle = "#CCC";
             ctx.font = "20px Tahoma";
